@@ -1,0 +1,57 @@
+<project xmlns:ivy="antlib:org.apache.ivy.ant" name="prodsched" default="main" basedir=".">
+    <description>
+        Scheduling algorithms - 6th Semester project.
+    </description>
+    <property name="src" location="src"/>
+    <property name="bin" location="bin"/>
+    <property name="lib" location="lib"/>
+    <property name="docs" location="docs"/>
+    <property name="data" location="data"/>
+    <property name="main-class" value="Main"/>
+    <property name="input" value="data/input.csv" />
+
+    <path id="classpath">
+        <fileset dir="${lib}" includes="**/*.jar"/>
+    </path>
+
+    <target name="resolve">
+        <ivy:retrieve/>
+    </target>
+
+    <target name="init" depends="resolve">
+        <!-- Create the time stamp -->
+        <tstamp/>
+        <!-- Create the build directory structure used by compile -->
+        <mkdir dir="${bin}"/>
+    </target>
+
+    <target name="build" depends="init">
+        <!-- Compile the files in src to bin -->
+        <javac includeantruntime="false" srcdir="${src}" destdir="${bin}" classpathref="classpath"/>
+    </target>
+
+    <target name="jar" depends="build">
+        <jar destfile="${ant.project.name}.jar" basedir="${bin}">
+            <manifest>
+                <attribute name="Main-Class" value="${main-class}"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="run" depends="jar">
+        <java fork="true" classname="${main-class}">
+            <classpath>
+                <path refid="classpath"/>
+                <path location="${ant.project.name}.jar"/>
+            </classpath>
+            <arg value="${input}"/>
+        </java>
+    </target>
+
+    <target name="clean">
+        <delete dir="bin"/>
+        <delete file="${ant.project.name}.jar"/>
+    </target>
+
+    <target name="main" depends="clean,jar"/>
+</project>
