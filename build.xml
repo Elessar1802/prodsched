@@ -14,11 +14,36 @@
         <fileset dir="${lib}" includes="**/*.jar"/>
     </path>
 
+    <target name="install-ivy" description="Install ivy">
+        <mkdir dir="${user.home}/.ant/lib"/>
+        <get dest="${user.home}/.ant/lib/ivy.jar" src="https://repo1.maven.org/maven2/org/apache/ivy/ivy/2.5.1/ivy-2.5.1.jar"/>
+    </target>
+
+    <condition property="lib-folder-doesnot-exists">
+        <not>
+            <available file="${lib}" property="lib.present"/>
+        </not>
+    </condition>
+
+    <condition property="check-algs4-lib-doesnot-exists">
+        <not>
+            <available file="${lib}/algs4.jar" property="algs4-lib.present"/>
+        </not>
+    </condition>
+
+    <target name="mkdir-lib" if="lib-folder-doesnot-exists">
+        <mkdir dir="${lib}"/>
+    </target>
+    
+    <target name="algs4-lib" description="Download algs4 jar file" depends="mkdir-lib" if="check-algs4-lib-doesnot-exists">
+        <get dest="${lib}/algs4.jar" src="https://algs4.cs.princeton.edu/code/algs4.jar"/>
+    </target>
+    
     <target name="resolve">
         <ivy:retrieve/>
     </target>
 
-    <target name="init" depends="resolve">
+    <target name="init" depends="resolve, algs4-lib">
         <!-- Create the time stamp -->
         <tstamp/>
         <!-- Create the build directory structure used by compile -->
@@ -49,8 +74,13 @@
     </target>
 
     <target name="clean">
-        <delete dir="bin"/>
+        <delete dir="${bin}"/>
         <delete file="${ant.project.name}.jar"/>
+    </target>
+
+    <target name="clean-all" depends="clean" description="Additionally purge ivy cache">
+        <ivy:cleancache/>
+        <delete dir="${lib}"/>
     </target>
 
     <target name="main" depends="clean,jar"/>
