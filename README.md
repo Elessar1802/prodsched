@@ -1,6 +1,8 @@
 # How to build
 - Install `ant` build tool for `java`. For Ubuntu - `sudo apt install ant`
-- Copy `ivy.jar` into `$HOME/.ant/lib` if using Linux
+- If `ivy` is not configured then
+    - run `ant install-ivy`
+    - This is only required for the initial setup. 
 - run
     ```bash
         ant run
